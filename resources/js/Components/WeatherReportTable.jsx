@@ -1,9 +1,15 @@
 // resources/js/components/WeatherReportTable.jsx
 
 import React from "react";
-// --- 1. Import the date formatting function ---
 import { formatDistanceToNow } from "date-fns";
+import { Edit, Trash2, History } from "lucide-react";
+import DynamicTimestamp from "@/Components/DynamicTimestamp";
 
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 import {
     Table,
     TableBody,
@@ -19,7 +25,60 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Edit, Trash2 } from "lucide-react";
+
+const getInitials = (name = "") => {
+    if (!name) return "?";
+    const names = name.split(" ");
+    if (names.length === 1) return names[0].charAt(0).toUpperCase();
+    return (
+        names[0].charAt(0) + names[names.length - 1].charAt(0)
+    ).toUpperCase();
+};
+
+const HistoryItem = ({ historyEntry }) => {
+    const userName = historyEntry.user?.name ?? "A deleted user";
+    return (
+        <div className="flex items-center gap-3">
+            <div className="flex size-8 items-center justify-center rounded-full bg-muted text-muted-foreground font-medium text-xs">
+                {getInitials(userName)}
+            </div>
+            <div className="grid gap-0.5">
+                <p className="font-medium text-sm text-foreground">
+                    {userName}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                    {formatDistanceToNow(new Date(historyEntry.created_at), {
+                        addSuffix: true,
+                    })}
+                </p>
+            </div>
+        </div>
+    );
+};
+
+const UserAvatar = ({ user, historyCount }) => {
+    const userName = user?.name ?? "System";
+    return (
+        <div className="flex items-center gap-3">
+            <div className="relative">
+                <div className="flex size-9 items-center justify-center rounded-full bg-secondary text-secondary-foreground font-medium text-sm">
+                    {getInitials(userName)}
+                </div>
+                {historyCount > 1 && (
+                    <span className="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
+                        {historyCount}
+                    </span>
+                )}
+            </div>
+            <div className="grid gap-0.5">
+                <p className="font-medium text-foreground">{userName}</p>
+                <p className="text-xs text-muted-foreground">
+                    {user?.email ?? "No email available"}
+                </p>
+            </div>
+        </div>
+    );
+};
 
 export default function WeatherReportTable({ reports, onEdit, onDelete }) {
     return (
@@ -31,22 +90,22 @@ export default function WeatherReportTable({ reports, onEdit, onDelete }) {
                     <TableHead>Wind</TableHead>
                     <TableHead>Precipitation</TableHead>
                     <TableHead>Sea</TableHead>
-                    <TableHead>Date</TableHead>
-                    {/* --- 2. Add the new "Last Updated" column header --- */}
-                    <TableHead>Last Updated</TableHead>
+                    <TableHead>Updated By</TableHead>
+                    <TableHead>Last Update</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {reports.length === 0 ? (
                     <TableRow>
-                        {/* --- 3. Update colSpan for the empty state --- */}
+                        {" "}
                         <TableCell
                             colSpan="8"
-                            className="text-center text-slate-500 py-10"
+                            className="text-center text-muted-foreground py-10"
                         >
-                            No weather reports found.
-                        </TableCell>
+                            {" "}
+                            No weather reports found.{" "}
+                        </TableCell>{" "}
                     </TableRow>
                 ) : (
                     reports.map((report) => (
@@ -59,23 +118,48 @@ export default function WeatherReportTable({ reports, onEdit, onDelete }) {
                             <TableCell>{report.precipitation}</TableCell>
                             <TableCell>{report.sea_condition}</TableCell>
                             <TableCell>
-                                {new Date(
-                                    report.report_date
-                                ).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                })}
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <button
+                                            className="w-full text-left rounded-md hover:bg-muted/50 p-1 -m-1 transition-colors disabled:pointer-events-none"
+                                            disabled={
+                                                !report.editHistories ||
+                                                report.editHistories.length ===
+                                                    0
+                                            }
+                                        >
+                                            <UserAvatar
+                                                user={report.user}
+                                                historyCount={
+                                                    report.editHistories
+                                                        ?.length || 0
+                                                }
+                                            />
+                                        </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-64 p-2 space-y-2">
+                                        <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground px-2">
+                                            <History className="size-4" />
+                                            <span>Edit History</span>
+                                        </div>
+
+                                        {/* --- THE FIX: Use optional chaining (?.) --- */}
+                                        {/* This will only run .map() if `editHistories` is an array. */}
+                                        {/* If it's undefined or null, it will do nothing, preventing the crash. */}
+                                        {report.editHistories?.map((entry) => (
+                                            <HistoryItem
+                                                key={entry.id}
+                                                historyEntry={entry}
+                                            />
+                                        ))}
+                                    </PopoverContent>
+                                </Popover>
                             </TableCell>
-                            {/* --- 4. Add the new cell with the formatted timestamp --- */}
-                            <TableCell className="text-slate-600">
-                                {formatDistanceToNow(
-                                    new Date(report.updated_at),
-                                    { addSuffix: true }
-                                )}
+                            <TableCell>
+                                <DynamicTimestamp date={report.updated_at} />
                             </TableCell>
                             <TableCell className="text-right space-x-2">
-                                <TooltipProvider>
+                                <TooltipProvider delayDuration={100}>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <Button
