@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
-import WeatherFormModal from "@/components/WeatherFormModal";
+import WeatherFormModal from "@/Components/WeatherForm";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import WeatherReportTable from "@/components/WeatherReportTable";
 import Pagination from "@/components/Pagination";

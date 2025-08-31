@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SituationalReportController;
 use App\Http\Controllers\WeatherReportController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -24,8 +25,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Weather CRUD Routes
-    Route::resource('weather', WeatherReportController::class);
+
+
+    Route::resource('situational-reports', SituationalReportController::class)
+        ->only(['index', 'store', 'update']);
 });
 
 

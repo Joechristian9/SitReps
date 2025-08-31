@@ -1,5 +1,5 @@
 import * as React from "react";
-import { usePage } from "@inertiajs/react"; // <-- 1. Import the usePage hook
+import { usePage } from "@inertiajs/react";
 import {
     AudioWaveform,
     BookOpen,
@@ -10,6 +10,7 @@ import {
     PieChart,
     Settings2,
 } from "lucide-react";
+import { MdOutlineHealthAndSafety } from "react-icons/md";
 
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
@@ -22,45 +23,70 @@ import {
     SidebarHeader,
     SidebarRail,
 } from "@/components/ui/sidebar";
+// The route function is now only used inside the component
 import { route } from "ziggy-js";
 
-import { MdOutlineHealthAndSafety } from "react-icons/md";
+// Data that is truly static can remain outside
+const staticTeams = [
+    {
+        name: "SitReps",
+        logo: MdOutlineHealthAndSafety,
+    },
+    {
+        name: "Acme Corp.",
+        logo: AudioWaveform,
+        plan: "Startup",
+    },
+    {
+        name: "Evil Corp.",
+        logo: Command,
+        plan: "Free",
+    },
+];
 
-const staticData = {
-    teams: [
-        {
-            name: "SitReps",
-            logo: MdOutlineHealthAndSafety,
-        },
-        {
-            name: "Acme Corp.",
-            logo: AudioWaveform,
-            plan: "Startup",
-        },
-        {
-            name: "Evil Corp.",
-            logo: Command,
-            plan: "Free",
-        },
-    ],
-    navMain: [
+const staticProjects = [
+    {
+        name: "Design Engineering",
+        url: "#",
+        icon: Frame,
+    },
+    {
+        name: "Sales & Marketing",
+        url: "#",
+        icon: PieChart,
+    },
+    {
+        name: "Travel",
+        url: "#",
+        icon: Map,
+    },
+];
+
+export function AppSidebar({ ...props }) {
+    const { auth } = usePage().props;
+
+    // --- MODIFICATION: Define navigation data inside the component ---
+    // This ensures `route()` is called only when the component renders.
+    const navMain = [
         {
             title: "Situation Overview",
             url: "#",
             icon: MdOutlineHealthAndSafety,
-            isActive: true,
+            // This now dynamically checks if the current route starts with 'situational-reports'
+            isActive: route().current("situational-reports.*"),
             items: [
                 {
-                    title: "Present weather",
-                    url: route("weather.index"),
+                    title: "Situation Reports",
+                    // This is now safe to call here
+                    url: route("situational-reports.index"),
                 },
                 {
-                    title: "Water Level Station",
-                    url: "#",
+                    title: "Add New Report",
+                    url: "#", // Link to the same page
                 },
                 {
                     title: "Status of Lifeline",
-                    url: "#",
+                    url: "#", // Keep as placeholder
                 },
             ],
         },
@@ -69,18 +95,9 @@ const staticData = {
             url: "#",
             icon: Bot,
             items: [
-                {
-                    title: "Genesis",
-                    url: "#",
-                },
-                {
-                    title: "Explorer",
-                    url: "#",
-                },
-                {
-                    title: "Quantum",
-                    url: "#",
-                },
+                { title: "Genesis", url: "#" },
+                { title: "Explorer", url: "#" },
+                { title: "Quantum", url: "#" },
             ],
         },
         {
@@ -88,22 +105,10 @@ const staticData = {
             url: "#",
             icon: BookOpen,
             items: [
-                {
-                    title: "Introduction",
-                    url: "#",
-                },
-                {
-                    title: "Get Started",
-                    url: "#",
-                },
-                {
-                    title: "Tutorials",
-                    url: "#",
-                },
-                {
-                    title: "Changelog",
-                    url: "#",
-                },
+                { title: "Introduction", url: "#" },
+                { title: "Get Started", url: "#" },
+                { title: "Tutorials", url: "#" },
+                { title: "Changelog", url: "#" },
             ],
         },
         {
@@ -111,55 +116,21 @@ const staticData = {
             url: "#",
             icon: Settings2,
             items: [
-                {
-                    title: "General",
-                    url: "#",
-                },
-                {
-                    title: "Team",
-                    url: "#",
-                },
-                {
-                    title: "Billing",
-                    url: "#",
-                },
-                {
-                    title: "Limits",
-                    url: "#",
-                },
+                { title: "General", url: "#" },
+                { title: "Team", url: "#" },
+                { title: "Billing", url: "#" },
+                { title: "Limits", url: "#" },
             ],
         },
-    ],
-    projects: [
-        {
-            name: "Design Engineering",
-            url: "#",
-            icon: Frame,
-        },
-        {
-            name: "Sales & Marketing",
-            url: "#",
-            icon: PieChart,
-        },
-        {
-            name: "Travel",
-            url: "#",
-            icon: Map,
-        },
-    ],
-};
+    ];
 
-export function AppSidebar({ ...props }) {
-    // --- 3. Get authenticated user data from Inertia's props ---
-    const { auth } = usePage().props;
-
-    // --- 4. Construct the final data object, merging static and dynamic data ---
     const data = {
-        ...staticData, // Use all the static data defined above
+        teams: staticTeams,
+        projects: staticProjects,
+        navMain: navMain, // Use the navigation data defined above
         user: {
-            name: auth.user.name, // Get name dynamically
-            email: auth.user.email, // Get email dynamically
-            // Generate a dynamic avatar URL based on the user's name
+            name: auth.user.name,
+            email: auth.user.email,
             avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
                 auth.user.name
             )}&background=random&color=fff`,
@@ -176,7 +147,6 @@ export function AppSidebar({ ...props }) {
                 <NavProjects projects={data.projects} />
             </SidebarContent>
             <SidebarFooter>
-                {/* The NavUser component now receives the dynamic user object */}
                 <NavUser user={data.user} />
             </SidebarFooter>
             <SidebarRail />

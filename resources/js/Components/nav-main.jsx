@@ -22,7 +22,7 @@ import {
 export function NavMain({ items }) {
     return (
         <SidebarGroup>
-            <SidebarGroupLabel>Situation Overview</SidebarGroupLabel>
+            <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
             <SidebarMenu>
                 {items.map((item) => (
                     <Collapsible
@@ -46,7 +46,7 @@ export function NavMain({ items }) {
                                             <SidebarMenuSubButton asChild>
                                                 <Link
                                                     href={route(
-                                                        "weather.index"
+                                                        "situational-reports.index"
                                                     )}
                                                 >
                                                     <span>{subItem.title}</span>
