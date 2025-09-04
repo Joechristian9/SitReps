@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SituationalReportController;
 use App\Http\Controllers\WeatherReportController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -27,8 +26,9 @@ Route::middleware('auth')->group(function () {
 
 
 
-    Route::resource('situational-reports', SituationalReportController::class)
-        ->only(['index', 'store', 'update']);
+    Route::resource('situational-reports', WeatherReportController::class)
+        ->only(['index', 'store', 'update'])
+        ->middleware('auth');
 });
 
 

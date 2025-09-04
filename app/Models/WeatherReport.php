@@ -22,7 +22,7 @@ class WeatherReport extends Model
         'precipitation',
         'sea_condition',
         'report_date',
-        'user_id', // Make sure this is in the array
+        'user_id',
     ];
 
     // --- ADD THIS FUNCTION ---

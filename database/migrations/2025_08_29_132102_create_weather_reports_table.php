@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('precipitation')->nullable();
             $table->string('sea_condition')->nullable();
             $table->timestamp('report_date')->useCurrent();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

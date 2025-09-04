@@ -28,6 +28,7 @@ class WeatherReportFactory extends Factory
             'precipitation' => $this->faker->randomElement($precipitations),
             'sea_condition' => $this->faker->randomElement($seaConditions),
             'report_date' => $this->faker->dateTimeThisYear(),
+            'user_id' => \App\Models\User::factory(),
         ];
     }
 }

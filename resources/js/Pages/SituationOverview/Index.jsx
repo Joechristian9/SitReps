@@ -21,9 +21,9 @@ import {
 } from "@/components/ui/card";
 
 // --- MODIFICATION: Updated import paths ---
-import SituationalReportForm from "@/components/SituationalReport/SituationalReportForm";
+import SituationalReportForm from "@/Components/SituationalReport/WeatherReportForm";
 import SituationalReportTable from "@/components/SituationalReport/SituationalReportTable";
-import SituationalReportEditModal from "@/components/SituationalReport/SituationalReportEditModal";
+import SituationalReportEditModal from "@/Components/SituationalReport/WeatherReportEditModal";
 
 export default function Index() {
     const { reports, flash } = usePage().props;
@@ -63,22 +63,20 @@ export default function Index() {
 
                 <main className="w-full p-6">
                     {/* The form to add a new report */}
-                    <SituationalReportForm />
 
                     {/* The table to display existing reports */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Existing Reports</CardTitle>
+                            <CardTitle>Reports</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <SituationalReportTable
+                            <SituationalReportForm />
+                            {/* <SituationalReportTable
                                 reports={reports.data}
                                 onEdit={handleEdit}
-                            />
+                            /> */}
                         </CardContent>
-                        <CardFooter>
-                            <Pagination links={reports.links} />
-                        </CardFooter>
+                        <CardFooter></CardFooter>
                     </Card>
                 </main>
             </SidebarInset>
